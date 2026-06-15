@@ -2,9 +2,9 @@
 spring.application.name=event-management
 
 # Database
-spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/eventmgmt_db}
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME:postgres}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:your_db_password}
+spring.datasource.url=jdbc:postgresql://localhost:5432/eventmgmt_db
+spring.datasource.username=your_db_username
+spring.datasource.password=your_db_password
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 # JPA
@@ -13,9 +13,9 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.properties.hibernate.format_sql=true
 
-# JWT
-app.jwt.secret=${APP_JWT_SECRET:your_jwt_secret}
-app.jwt.expiration=${APP_JWT_EXPIRATION:86400000}
+# JWT — must be at least 64 characters
+app.jwt.secret=your_jwt_secret_at_least_64_characters_long
+app.jwt.expiration=86400000
 
 # Server
 server.port=8080
@@ -23,8 +23,8 @@ server.port=8080
 # Email
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
-spring.mail.username=${SPRING_MAIL_USERNAME:your_email}
-spring.mail.password=${SPRING_MAIL_PASSWORD:your_app_password}
+spring.mail.username=your_gmail@gmail.com
+spring.mail.password=your_gmail_app_password
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 spring.mail.properties.mail.smtp.starttls.required=true
