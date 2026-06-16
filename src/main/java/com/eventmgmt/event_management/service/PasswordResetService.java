@@ -31,7 +31,8 @@ public class PasswordResetService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    private static final String FRONTEND_URL = "http://localhost:5173";
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
 
     public String requestPasswordReset(String email) {
         User user = userRepository.findByEmail(email)
@@ -71,12 +72,12 @@ public class PasswordResetService {
     }
 
     @Async
-    private void sendResetEmail(User user, String token) {
+    public void sendResetEmail(User user, String token) {
         try {
+            String resetLink = frontendUrl + "/reset-password?token=" + token;
+
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            String resetLink = FRONTEND_URL + "/reset-password?token=" + token;
 
             helper.setFrom("EventMgr <" + fromEmail + ">");
             helper.setTo(user.getEmail());
@@ -132,7 +133,7 @@ public class PasswordResetService {
                       </div>
 
                       <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.25);line-height:1.6;">
-                        If you did not request a password reset, please ignore this email. Your password will not be changed.
+                        If you did not request a password reset please ignore this email. Your password will not be changed.
                       </p>
                     </td></tr>
 

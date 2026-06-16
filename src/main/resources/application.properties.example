@@ -31,3 +31,7 @@ spring.mail.properties.mail.smtp.starttls.required=true
 spring.mail.properties.mail.smtp.connectiontimeout=5000
 spring.mail.properties.mail.smtp.timeout=5000
 spring.mail.properties.mail.smtp.writetimeout=5000
+
+#URL
+app.frontend.url=${APP_FRONTEND_URL:your_frontend_url}
+app.backend.url=${APP_BACKEND_URL:your_backend_url}

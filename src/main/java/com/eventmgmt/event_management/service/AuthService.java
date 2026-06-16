@@ -27,6 +27,12 @@ public class AuthService {
     private final VerificationEmailService verificationEmailService;
 
     public String register(RegisterRequest request) {
+
+        if (request.getRole() != null &&
+                request.getRole().toUpperCase().equals("ADMIN")) {
+            throw new RuntimeException("Cannot register as Admin.");
+        }
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already registered");
         }

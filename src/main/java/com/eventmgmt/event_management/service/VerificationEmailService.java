@@ -19,8 +19,8 @@ public class VerificationEmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    // Change this to your backend URL when deployed
-    private static final String BASE_URL = "http://localhost:8080";
+    @Value("${app.backend.url:http://localhost:8080}")
+    private String backendUrl;
 
     @Async
     public void sendVerificationEmail(User user) {
@@ -28,10 +28,12 @@ public class VerificationEmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
+            String verificationLink = backendUrl + "/api/auth/verify?token=" + user.getVerificationToken();
+
             helper.setFrom("EventMgr <" + fromEmail + ">");
             helper.setTo(user.getEmail());
             helper.setSubject("Verify Your EventMgr Account");
-            helper.setText(buildVerificationHtml(user), true);
+            helper.setText(buildVerificationHtml(user, verificationLink), true);
 
             mailSender.send(message);
             System.out.println("Verification email sent to: " + user.getEmail());
@@ -41,9 +43,7 @@ public class VerificationEmailService {
         }
     }
 
-    private String buildVerificationHtml(User user) {
-        String verificationLink = BASE_URL + "/api/auth/verify?token=" + user.getVerificationToken();
-
+    private String buildVerificationHtml(User user, String verificationLink) {
         return """
             <!DOCTYPE html>
             <html>
@@ -53,18 +53,15 @@ public class VerificationEmailService {
                 <tr><td align="center">
                   <table width="520" cellpadding="0" cellspacing="0" style="background:#13090c;border:1px solid rgba(232,201,126,0.2);">
 
-                    <!-- Gold bar -->
                     <tr><td style="background:#e8c97e;padding:10px;text-align:center;">
                       <span style="font-size:11px;font-weight:700;color:#1a0e05;letter-spacing:3px;">VERIFY YOUR ACCOUNT</span>
                     </td></tr>
 
-                    <!-- Header -->
                     <tr><td style="padding:36px 40px 24px;text-align:center;border-bottom:1px solid rgba(232,201,126,0.1);">
                       <p style="margin:0 0 6px;font-size:28px;font-weight:800;color:#e8c97e;">EventMgr</p>
                       <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);">One step away from your account</p>
                     </td></tr>
 
-                    <!-- Body -->
                     <tr><td style="padding:36px 40px;">
                       <p style="margin:0 0 8px;font-size:13px;color:rgba(255,255,255,0.5);">Hello,</p>
                       <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#fff;">%s</p>
@@ -73,16 +70,14 @@ public class VerificationEmailService {
                         Thank you for registering on EventMgr. Please verify your email address by clicking the button below to activate your account.
                       </p>
 
-                      <!-- Verify button -->
                       <table cellpadding="0" cellspacing="0" style="margin:0 auto 28px;">
-                        <tr><td style="background:#e8c97e;clip-path:polygon(0 0,calc(100%% - 10px) 0,100%% 10px,100%% 100%%,10px 100%%,0 calc(100%% - 10px));">
+                        <tr><td style="background:#e8c97e;">
                           <a href="%s" style="display:block;padding:16px 40px;font-size:14px;font-weight:700;color:#1a0e05;text-decoration:none;letter-spacing:1px;text-transform:uppercase;">
                             Verify My Email →
                           </a>
                         </td></tr>
                       </table>
 
-                      <!-- Link fallback -->
                       <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:14px 16px;margin-bottom:24px;">
                         <p style="margin:0 0 6px;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase;">Or copy this link</p>
                         <p style="margin:0;font-size:11px;color:#e8c97e;word-break:break-all;">%s</p>
@@ -93,7 +88,6 @@ public class VerificationEmailService {
                       </p>
                     </td></tr>
 
-                    <!-- Footer -->
                     <tr><td style="padding:20px 40px 28px;border-top:1px solid rgba(232,201,126,0.1);text-align:center;">
                       <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.25);">EventMgr · Your Event Platform</p>
                     </td></tr>
