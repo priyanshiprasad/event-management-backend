@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-alpine AS build
+FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
@@ -7,7 +7,7 @@ COPY .mvn ./.mvn
 RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
