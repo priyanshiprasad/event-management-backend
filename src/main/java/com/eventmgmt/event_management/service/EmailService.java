@@ -31,7 +31,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom("EventManager <aifocusguardian@gmail.com>");
+            helper.setFrom("EventManager <priyanshiprasad2004@gmail.com>");
             helper.setTo(booking.getUser().getEmail());
             helper.setSubject("🎟 Your Ticket for " + booking.getEvent().getTitle());
             helper.setText(buildEmailHtml(booking), true);
