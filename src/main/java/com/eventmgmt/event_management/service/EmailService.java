@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 public class EmailService {
 
     @Autowired
-    private BrevoEmailService brevoEmailService;
+    private ResendEmailService resendEmailService;
 
     @Autowired
     private PdfTicketService pdfTicketService;
@@ -26,7 +26,7 @@ public class EmailService {
             String subject = "Your Ticket — " + booking.getEvent().getTitle();
             String fileName = "EventManager_Ticket_" + booking.getId() + ".pdf";
 
-            brevoEmailService.sendEmailWithAttachment(
+            resendEmailService.sendEmailWithAttachment(
                     booking.getUser().getEmail(), subject, htmlContent, fileName, pdfTicket);
 
         } catch (Exception e) {

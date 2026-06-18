@@ -18,7 +18,7 @@ public class PasswordResetService {
     private UserRepository userRepository;
 
     @Autowired
-    private BrevoEmailService brevoEmailService;
+    private ResendEmailService resendEmailService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -69,7 +69,7 @@ public class PasswordResetService {
     public void sendResetEmail(User user, String token) {
         String resetLink = frontendUrl + "/reset-password?token=" + token;
         String htmlContent = buildResetEmailHtml(user.getName(), resetLink);
-        brevoEmailService.sendEmail(user.getEmail(), "Reset Your EventManager Password", htmlContent);
+        resendEmailService.sendEmail(user.getEmail(), "Reset Your EventManager Password", htmlContent);
     }
 
     private String buildResetEmailHtml(String name, String resetLink) {

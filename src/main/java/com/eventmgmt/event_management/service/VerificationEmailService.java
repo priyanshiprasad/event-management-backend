@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class VerificationEmailService {
 
     @Autowired
-    private BrevoEmailService brevoEmailService;
+    private ResendEmailService resendEmailService;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -25,7 +25,7 @@ public class VerificationEmailService {
     public void sendVerificationEmail(User user) {
         String verificationLink = backendUrl + "/api/auth/verify?token=" + user.getVerificationToken();
         String htmlContent = buildVerificationHtml(user, verificationLink);
-        brevoEmailService.sendEmail(user.getEmail(), "Verify Your EventMgr Account", htmlContent);
+        resendEmailService.sendEmail(user.getEmail(), "Verify Your EventMgr Account", htmlContent);
     }
 
     private String buildVerificationHtml(User user, String verificationLink) {
