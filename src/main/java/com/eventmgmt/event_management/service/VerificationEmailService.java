@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class VerificationEmailService {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private BrevoEmailService brevoEmailService;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -22,25 +22,10 @@ public class VerificationEmailService {
     @Value("${app.backend.url:http://localhost:8080}")
     private String backendUrl;
 
-    @Async
     public void sendVerificationEmail(User user) {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            String verificationLink = backendUrl + "/api/auth/verify?token=" + user.getVerificationToken();
-
-            helper.setFrom("EventMgr <" + fromEmail + ">");
-            helper.setTo(user.getEmail());
-            helper.setSubject("Verify Your EventMgr Account");
-            helper.setText(buildVerificationHtml(user, verificationLink), true);
-
-            mailSender.send(message);
-            System.out.println("Verification email sent to: " + user.getEmail());
-
-        } catch (MessagingException e) {
-            System.err.println("Failed to send verification email: " + e.getMessage());
-        }
+        String verificationLink = backendUrl + "/api/auth/verify?token=" + user.getVerificationToken();
+        String htmlContent = buildVerificationHtml(user, verificationLink);
+        brevoEmailService.sendEmail(user.getEmail(), "Verify Your EventMgr Account", htmlContent);
     }
 
     private String buildVerificationHtml(User user, String verificationLink) {

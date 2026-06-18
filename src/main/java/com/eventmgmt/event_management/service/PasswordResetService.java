@@ -3,13 +3,8 @@ package com.eventmgmt.event_management.service;
 import com.eventmgmt.event_management.entity.User;
 import com.eventmgmt.event_management.exception.ResourceNotFoundException;
 import com.eventmgmt.event_management.repository.UserRepository;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +18,7 @@ public class PasswordResetService {
     private UserRepository userRepository;
 
     @Autowired
-    private JavaMailSender mailSender;
+    private BrevoEmailService brevoEmailService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -71,25 +66,10 @@ public class PasswordResetService {
         return "Password reset successfully. You can now login.";
     }
 
-    @Async
     public void sendResetEmail(User user, String token) {
-        try {
-            String resetLink = frontendUrl + "/reset-password?token=" + token;
-
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom("EventMgr <" + fromEmail + ">");
-            helper.setTo(user.getEmail());
-            helper.setSubject("Reset Your EventMgr Password");
-            helper.setText(buildResetEmailHtml(user.getName(), resetLink), true);
-
-            mailSender.send(message);
-            System.out.println("Password reset email sent to: " + user.getEmail());
-
-        } catch (MessagingException e) {
-            System.err.println("Failed to send reset email: " + e.getMessage());
-        }
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
+        String htmlContent = buildResetEmailHtml(user.getName(), resetLink);
+        brevoEmailService.sendEmail(user.getEmail(), "Reset Your EventManager Password", htmlContent);
     }
 
     private String buildResetEmailHtml(String name, String resetLink) {

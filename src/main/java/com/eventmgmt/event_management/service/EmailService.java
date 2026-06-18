@@ -1,13 +1,8 @@
 package com.eventmgmt.event_management.service;
 
 import com.eventmgmt.event_management.entity.Booking;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -16,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 public class EmailService {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private BrevoEmailService brevoEmailService;
 
     @Autowired
     private PdfTicketService pdfTicketService;
@@ -24,34 +19,18 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    @Async
     public void sendBookingConfirmation(Booking booking) {
         try {
             byte[] pdfTicket = pdfTicketService.generateTicket(booking);
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            String htmlContent = buildEmailHtml(booking);
+            String subject = "Your Ticket — " + booking.getEvent().getTitle();
+            String fileName = "EventManager_Ticket_" + booking.getId() + ".pdf";
 
-            helper.setFrom("EventManager <priyanshiprasad2004@gmail.com>");
-            helper.setTo(booking.getUser().getEmail());
-            helper.setSubject("🎟 Your Ticket for " + booking.getEvent().getTitle());
-            helper.setText(buildEmailHtml(booking), true);
-
-            // Important headers that help avoid spam
-            message.addHeader("X-Priority", "1");
-            message.addHeader("X-Mailer", "EventManager Mailer");
-            message.addHeader("Importance", "High");
-
-            helper.addAttachment(
-                    "EventManager_Ticket_" + booking.getId() + ".pdf",
-                    new org.springframework.core.io.ByteArrayResource(pdfTicket),
-                    "application/pdf"
-            );
-
-            mailSender.send(message);
-            System.out.println("Ticket email sent to: " + booking.getUser().getEmail());
+            brevoEmailService.sendEmailWithAttachment(
+                    booking.getUser().getEmail(), subject, htmlContent, fileName, pdfTicket);
 
         } catch (Exception e) {
-            System.err.println("Failed to send email: " + e.getMessage());
+            System.err.println("Failed to generate ticket: " + e.getMessage());
         }
     }
 
